@@ -22,3 +22,6 @@ class TeamSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+    def to_model(self):
+        return Team(id = self.id, name = self.name, progress = self.progress, event_id = self.event_id)

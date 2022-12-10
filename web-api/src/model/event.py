@@ -10,7 +10,7 @@ class Event(Base):
                 index=True, autoincrement=False)
     name = Column('name', String(45), nullable=False)
     description = Column('description', String(200), nullable=False)
-    passwd = Column('passwd', String(45), nullable=False)
+    passwd = Column('passwd', String(128), nullable=False)
 
 
 class EventSchema(BaseModel):
@@ -21,3 +21,6 @@ class EventSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+    def to_model(self):
+        return Event(id=self.id, name=self.name, description=self.description, passwd=self.passwd)
