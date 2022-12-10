@@ -7,6 +7,7 @@ import sys
 import db
 import model
 import uvicorn
+from router.events import router as events_router
 
 
 app = FastAPI()
@@ -26,13 +27,13 @@ app.add_middleware(
 async def request_validation_handler(req, exc):
     return JSONResponse(status_code=400, content={"code": "InvalidParameter"})
 
+app.include_router(events_router)
 
 def main():
     uvicorn.run('main:app',
                 port=int(web_api_config.get("PORT")),
                 host=web_api_config.get("HOST"),
                 reload=True,)
-
 
 if __name__ == '__main__':
     main()
