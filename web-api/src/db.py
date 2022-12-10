@@ -2,7 +2,7 @@ from random import random
 import time
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from config import db_config
 import utils.logger as logger
 
@@ -34,6 +34,20 @@ def get_db():
         db.close()
 
 
-def idgen() -> str:
+def idgen():
     current = int(time.time() * 1000)
-    return f"{current - 1654319790000}{int(random() * 1000)}"
+    return int(f"{current - 1654319790000}{int(random() * 1000)}")
+
+
+class Transactional(object):
+    def __init__(self, db: Session):
+        self.db = db
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if(any(exc is not None for exc in [exc_type, exc_value, traceback])):
+            self.db.rollback()
+        else:
+            self.db.commit()
