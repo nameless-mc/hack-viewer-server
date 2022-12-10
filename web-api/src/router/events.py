@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from model.team import Team, TeamSchema
 from model.event import Event, EventSchema
-from utils.error import resourceNouFoundError
+from utils.error import ResourceNouFoundException
 from db import get_db
 
 router = APIRouter()
@@ -15,7 +15,7 @@ async def get_event(event_id: int, db: Session = Depends(get_db)):
     event: EventSchema = db.get(Event, event_id)
 
     if(event is None):
-        return resourceNouFoundError("event")
+        raise ResourceNouFoundException("event")
 
     return {
         "name": event.name,
@@ -28,7 +28,7 @@ async def get_teams(event_id: int, db: Session = Depends(get_db)):
     event: EventSchema = db.get(Event, event_id)
 
     if(event is None):
-        return resourceNouFoundError("event")
+        raise ResourceNouFoundException("event")
 
     teams: List[TeamSchema] = db.query(Team).filter(
         Team.event_id == event_id).all()
@@ -43,13 +43,13 @@ async def get_team(event_id: int, team_id: int, db: Session = Depends(get_db)):
     event: EventSchema = db.get(Event, event_id)
 
     if(event is None):
-        return resourceNouFoundError("event")
+        raise ResourceNouFoundException("event")
 
     try:
         team: TeamSchema = db.query(Team).filter(Team.id == team_id,
                                                  Team.event_id == event_id).one()
     except:
-        return resourceNouFoundError("team")
+        raise ResourceNouFoundException("team")
 
     return {"name": team.name, "progress": team.progress}
 
@@ -63,13 +63,13 @@ async def put_team_progress(event_id: int, team_id: int, body: PutTeamProgressRe
     event: EventSchema = db.get(Event, event_id)
 
     if(event is None):
-        return resourceNouFoundError("event")
+        raise ResourceNouFoundException("event")
 
     try:
         team: TeamSchema = db.query(Team).filter(Team.id == team_id,
                                                  Team.event_id == event_id).one()
     except:
-        return resourceNouFoundError("team")
+        raise ResourceNouFoundException("team")
 
     team.progress = body.progress
 
@@ -87,13 +87,13 @@ async def put_team_name(event_id: int, team_id: int, body: PutTeamNameRequestBod
     event: EventSchema = db.get(Event, event_id)
 
     if(event is None):
-        return resourceNouFoundError("event")
+        raise ResourceNouFoundException("event")
 
     try:
         team: TeamSchema = db.query(Team).filter(Team.id == team_id,
                                                  Team.event_id == event_id).one()
     except:
-        return resourceNouFoundError("team")
+        raise ResourceNouFoundException("team")
 
     team.name = body.name
 
