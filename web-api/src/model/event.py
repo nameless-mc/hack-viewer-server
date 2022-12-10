@@ -6,10 +6,11 @@ from sqlalchemy.sql.sqltypes import String, BigInteger
 
 class Event(Base):
     __tablename__ = 'events'
-    id = Column('id', BigInteger, primary_key=True, index=True)
-    name = Column('name', String, nullable=False)
-    description = Column('description', String, nullable=False)
-    passwd = Column('passwd', String, nullable=False)
+    id = Column('id', BigInteger, primary_key=True,
+                index=True, autoincrement=False)
+    name = Column('name', String(45), nullable=False)
+    description = Column('description', String(200), nullable=False)
+    passwd = Column('passwd', String(45), nullable=False)
 
 
 class EventSchema(BaseModel):
