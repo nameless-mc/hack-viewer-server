@@ -1,22 +1,15 @@
-from typing import List
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from model.team import Team, TeamSchema
-from model.event import Event, EventSchema
-from utils.error import ResourceNouFoundException
 from db import get_db
+import query.events_query as query
 
 router = APIRouter()
 
 
 @router.get("/api/events/{event_id}")
 async def get_event(event_id: int, db: Session = Depends(get_db)):
-    event: EventSchema = db.get(Event, event_id)
-
-    if(event is None):
-        raise ResourceNouFoundException("event")
-
+    event = query.get_event(db, event_id)
     return {
         "name": event.name,
         "description": event.description
@@ -25,14 +18,7 @@ async def get_event(event_id: int, db: Session = Depends(get_db)):
 
 @router.get("/api/events/{event_id}/teams")
 async def get_teams(event_id: int, db: Session = Depends(get_db)):
-    event: EventSchema = db.get(Event, event_id)
-
-    if(event is None):
-        raise ResourceNouFoundException("event")
-
-    teams: List[TeamSchema] = db.query(Team).filter(
-        Team.event_id == event_id).all()
-
+    teams = query.get_teams(db, event_id)
     return {
         "teams": [{"name": t.name, "progress": t.progress} for t in teams]
     }
@@ -40,17 +26,7 @@ async def get_teams(event_id: int, db: Session = Depends(get_db)):
 
 @router.get("/api/events/{event_id}/teams/{team_id}")
 async def get_team(event_id: int, team_id: int, db: Session = Depends(get_db)):
-    event: EventSchema = db.get(Event, event_id)
-
-    if(event is None):
-        raise ResourceNouFoundException("event")
-
-    try:
-        team: TeamSchema = db.query(Team).filter(Team.id == team_id,
-                                                 Team.event_id == event_id).one()
-    except:
-        raise ResourceNouFoundException("team")
-
+    team = query.get_team(db, event_id, team_id)
     return {"name": team.name, "progress": team.progress}
 
 
@@ -60,21 +36,7 @@ class PutTeamProgressRequestBody(BaseModel):
 
 @router.put("/api/events/{event_id}/teams/{team_id}/progress")
 async def put_team_progress(event_id: int, team_id: int, body: PutTeamProgressRequestBody, db: Session = Depends(get_db)):
-    event: EventSchema = db.get(Event, event_id)
-
-    if(event is None):
-        raise ResourceNouFoundException("event")
-
-    try:
-        team: TeamSchema = db.query(Team).filter(Team.id == team_id,
-                                                 Team.event_id == event_id).one()
-    except:
-        raise ResourceNouFoundException("team")
-
-    team.progress = body.progress
-
-    db.commit()
-
+    team = query.update_team_progress(db, event_id, team_id, body.progress)
     return {"name": team.name, "progress": team.progress}
 
 
@@ -84,19 +46,5 @@ class PutTeamNameRequestBody(BaseModel):
 
 @router.put("/api/events/{event_id}/teams/{team_id}/name")
 async def put_team_name(event_id: int, team_id: int, body: PutTeamNameRequestBody, db: Session = Depends(get_db)):
-    event: EventSchema = db.get(Event, event_id)
-
-    if(event is None):
-        raise ResourceNouFoundException("event")
-
-    try:
-        team: TeamSchema = db.query(Team).filter(Team.id == team_id,
-                                                 Team.event_id == event_id).one()
-    except:
-        raise ResourceNouFoundException("team")
-
-    team.name = body.name
-
-    db.commit()
-
+    team = query.update_team_name(db, event_id, team_id, body.name)
     return {"name": team.name, "progress": team.progress}
