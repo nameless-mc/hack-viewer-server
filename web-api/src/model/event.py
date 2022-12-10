@@ -1,6 +1,6 @@
+from pydantic import BaseModel
 from db import Base
 from sqlalchemy import Column
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import String, BigInteger
 
 
@@ -10,3 +10,13 @@ class Event(Base):
     name = Column('name', String, nullable=False)
     description = Column('description', String, nullable=False)
     passwd = Column('passwd', String, nullable=False)
+
+
+class EventSchema(BaseModel):
+    id: int
+    name: str
+    description: str
+    passwd: str
+
+    class Config:
+        orm_mode = True
