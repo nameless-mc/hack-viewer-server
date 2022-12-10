@@ -4,6 +4,8 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from config import web_api_config, origins
 import sys
+import db
+import model
 import uvicorn
 
 
