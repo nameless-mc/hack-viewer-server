@@ -1,0 +1,35 @@
+version: "3"
+services:
+  web:
+    build: ./web-api
+    ports:
+      - 8081:8081
+    volumes:
+      - type: bind
+        source: ./web-api
+        target: /app
+#     depends_on:
+#       - db
+#     networks:
+#       - hack-viewer-network
+#   db:
+#     image: mysql:8.0
+#     platform: linux/x86_64
+#     volumes:
+#       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+#       - ./docker/db/initdb.d:/docker-entrypoint-initdb.d
+#       - ./docker/db/data:/var/lib/mysql
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=hack-viewer
+#       - MYSQL_DATABASE=hack-viewer
+#       - MYSQL_USER=hack-viewer
+#       - MYSQL_PASSWORD=hack-viewer
+#       - TZ=Asia/Tokyo
+#     ports:
+#       - 3306:3306
+#     networks:
+#       - hack-viewer-network
+
+# networks:
+#   hack-viewer-network:
+#     driver: bridge
