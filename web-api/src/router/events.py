@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from db import get_db
+from db import get_db, Transactional
 import query.events_query as query
 
 router = APIRouter()
@@ -36,8 +36,9 @@ class PutTeamProgressRequestBody(BaseModel):
 
 @router.put("/api/events/{event_id}/teams/{team_id}/progress")
 async def put_team_progress(event_id: int, team_id: int, body: PutTeamProgressRequestBody, db: Session = Depends(get_db)):
-    team = query.update_team_progress(db, event_id, team_id, body.progress)
-    return {"name": team.name, "progress": team.progress}
+    with Transactional(db):
+        team = query.update_team_progress(db, event_id, team_id, body.progress)
+        return {"name": team.name, "progress": team.progress}
 
 
 class PutTeamNameRequestBody(BaseModel):
@@ -46,5 +47,6 @@ class PutTeamNameRequestBody(BaseModel):
 
 @router.put("/api/events/{event_id}/teams/{team_id}/name")
 async def put_team_name(event_id: int, team_id: int, body: PutTeamNameRequestBody, db: Session = Depends(get_db)):
-    team = query.update_team_name(db, event_id, team_id, body.name)
-    return {"name": team.name, "progress": team.progress}
+    with Transactional(db):
+        team = query.update_team_name(db, event_id, team_id, body.name)
+        return {"name": team.name, "progress": team.progress}
