@@ -11,9 +11,14 @@ class ResourceNouFoundException(HTTPException):
 
 class InvalidParameterException(HTTPException):
     def __init__(self) -> None:
-        super().__init__(status_code=403, code="Forbidden")
+        super().__init__(status_code=400, code="InvalidParameter")
 
 
 class ForbiddenException(HTTPException):
     def __init__(self) -> None:
         super().__init__(status_code=403, code="Forbidden")
+
+
+class UnauthorizedException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(status_code=401, code="Unauthorized")
